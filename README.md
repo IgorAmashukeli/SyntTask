@@ -1,0 +1,2 @@
+# SyntTask
+Syntacore trial task
