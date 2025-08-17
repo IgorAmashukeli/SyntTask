@@ -19,10 +19,11 @@ bool Equivalent(const K1& key_1, const K2& key_2, Compare compare) {
 }
 
 template <typename K>
-struct SetNode;
+class SetNode;
 
 template <typename K>
-struct SetBaseNode {
+class SetBaseNode {
+public:
     SetBaseNode() noexcept = default;
     SetBaseNode(const SetBaseNode& other) = delete;
     SetBaseNode& operator=(const SetBaseNode& other) = delete;
@@ -49,16 +50,8 @@ struct SetBaseNode {
 };
 
 template <typename K>
-struct SetNode : public SetBaseNode<K> {
-    const K key_;
-    std::unique_ptr<SetNode<K>> left_;
-    std::unique_ptr<SetNode<K>> right_;
-    SetNode<K>* parent_ = nullptr;
-    SetBaseNode<K>* prev_ = nullptr;
-    SetBaseNode<K>* next_ = nullptr;
-    size_t size_ = 1;
-    signed char balance_ = 0;
-
+class SetNode : public SetBaseNode<K> {
+public:
     SetNode() = default;
     SetNode(const SetNode& other) = delete;
     SetNode& operator=(const SetNode& other) = delete;
@@ -125,13 +118,21 @@ struct SetNode : public SetBaseNode<K> {
     bool IsSetEndNode() const noexcept {
         return false;
     }
+
+private:
+    const K key_;
+    std::unique_ptr<SetNode<K>> left_;
+    std::unique_ptr<SetNode<K>> right_;
+    SetNode<K>* parent_ = nullptr;
+    SetBaseNode<K>* prev_ = nullptr;
+    SetBaseNode<K>* next_ = nullptr;
+    size_t size_ = 1;
+    signed char balance_ = 0;
 };
 
 template <typename K>
-struct SetEndNode : public SetBaseNode<K> {
-    SetBaseNode<K>* prev_ = nullptr;
-    SetBaseNode<K>* next_ = nullptr;
-
+class SetEndNode : public SetBaseNode<K> {
+public:
     SetEndNode() noexcept = default;
     SetEndNode(const SetEndNode& other) = delete;
     SetEndNode& operator=(const SetEndNode& other) = delete;
@@ -189,6 +190,10 @@ struct SetEndNode : public SetBaseNode<K> {
     bool IsSetEndNode() const noexcept {
         return true;
     }
+
+private:
+    SetBaseNode<K>* prev_ = nullptr;
+    SetBaseNode<K>* next_ = nullptr;
 };
 
 template <typename K, typename Compare = std::less<K>>
