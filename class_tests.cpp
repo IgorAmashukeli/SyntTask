@@ -115,6 +115,36 @@ void TestCopyAssignment() {
     std::cout << "TestCopyAssignment passed\n";
 }
 
+void TestCopySelfAssignment() {
+    auto input = GenerateRandomVector(50, -500, 500, 99);
+    SetAVL<int> set;
+    for (int val : input) {
+        set.Insert(val);
+    }
+
+    // Build expected sorted unique values
+    std::vector<int> sorted_unique = input;
+    std::sort(sorted_unique.begin(), sorted_unique.end());
+    sorted_unique.erase(std::unique(sorted_unique.begin(), sorted_unique.end()),
+                        sorted_unique.end());
+
+    // Copy self-assignment
+    set = set;
+
+    // Validate size
+    assert(set.Size() == sorted_unique.size());
+
+    // Validate elements
+    auto it = set.Begin();
+    for (size_t i = 0; i < sorted_unique.size(); ++i) {
+        assert(it != set.End());
+        assert(*it == sorted_unique[i]);
+        ++it;
+    }
+
+    std::cout << "TestCopySelfAssignment passed\n";
+}
+
 void TestMoveConstructor() {
     auto input = GenerateRandomVector(100, -1000, 1000, 44);
     SetAVL<int> original;
@@ -164,6 +194,36 @@ void TestMoveAssignment() {
     assert(it == moved.End());
     assert(original.Empty());
     std::cout << "TestMoveAssignment passed\n";
+}
+
+void TestMoveSelfAssignment() {
+    auto input = GenerateRandomVector(50, -500, 500, 100);
+    SetAVL<int> set;
+    for (int val : input) {
+        set.Insert(val);
+    }
+
+    // Build expected sorted unique values
+    std::vector<int> sorted_unique = input;
+    std::sort(sorted_unique.begin(), sorted_unique.end());
+    sorted_unique.erase(std::unique(sorted_unique.begin(), sorted_unique.end()),
+                        sorted_unique.end());
+
+    // Move self-assignment
+    set = std::move(set);
+
+    // Validate size
+    assert(set.Size() == sorted_unique.size());
+
+    // Validate elements
+    auto it = set.Begin();
+    for (size_t i = 0; i < sorted_unique.size(); ++i) {
+        assert(it != set.End());
+        assert(*it == sorted_unique[i]);
+        ++it;
+    }
+
+    std::cout << "TestMoveSelfAssignment passed\n";
 }
 
 void TestClear() {
@@ -1065,8 +1125,10 @@ int main() {
     TestComparatorConstructor();
     TestCopyConstructor();
     TestCopyAssignment();
+    TestCopySelfAssignment();
     TestMoveConstructor();
     TestMoveAssignment();
+    TestMoveSelfAssignment();
     TestClear();
     TestSwap();
     TestInsertConstLValue();

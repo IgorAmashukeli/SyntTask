@@ -433,25 +433,17 @@ public:
     explicit SetAVL(const Compare& compare) : root_compare_(nullptr, compare) {
     }
     SetAVL(const SetAVL& other) {
-        SetBaseNode<K>* max_node = Copy(other);
-        ConnectSetEndNodesAfterCopy(max_node);
+        Copy(other);
     }
     SetAVL& operator=(const SetAVL& other) {
-        if (this != std::addressof(other)) {
-            Clear();
-            SetBaseNode<K>* max_node = Copy(other);
-            ConnectSetEndNodesAfterCopy(max_node);
-        }
-        return *this;
+        return *this = SetAVL(other);
     }
-    SetAVL(SetAVL&& other) {
+    SetAVL(SetAVL&& other) noexcept {
         Swap(other);
     }
-    SetAVL& operator=(SetAVL&& other) {
-        if (this != std::addressof(other)) {
-            Swap(other);
-            other.Clear();
-        }
+    SetAVL& operator=(SetAVL&& other) noexcept {
+        SetAVL tmp = std::move(other);
+        Swap(tmp);
         return *this;
     }
     ~SetAVL() = default;
@@ -916,9 +908,9 @@ private:
         }
     }
 
-    SetBaseNode<K>* Copy(const SetAVL& other) {
+    void Copy(const SetAVL& other) {
         if (other.Empty()) {
-            return nullptr;
+            return;
         }
         SetBaseNode<K>* prev_node = std::addressof(rend_node_);
         std::stack<std::tuple<SetNode<K>*, bool, bool>> other_nodes;
@@ -932,7 +924,7 @@ private:
             CopyIteration(other, other_nodes, nodes, top_other_node, visit_left, visit_right,
                           prev_node);
         }
-        return prev_node;
+        ConnectSetEndNodesAfterCopy(prev_node);
     }
 
     void ConnectPrevNext(SetNode<K>* node, SetBaseNode<K>* prev, SetBaseNode<K>* next) {
